@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="item2">
+	<!-- 컬럼명과 property명을 일치-->
+	<resultMap type="ItemVo2" id="itemMap2">
+		<id column="item_num2" property="itemNo2"/>
+		<result column="item_img2" property="itemImg2"/>
+		<result column="item_price" property="itemPrice2"/>
+		<result column="item_store2" property="itemStore2"/>
+		<result column="item_date2" property="itemDate2"/>
+		<result column="cate_num" property="cateNo"/>
+		<result column="mem_num" property="memNo"/>
+	</resultMap> 
+
+</mapper>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<typeAliases>
+		<typeAlias type="kdb.spring.vo.BoardVo" alias="BoardVo"/>
+		<typeAlias type="kdb.spring.vo.CategoryVo" alias="CategoryVo"/>
+		<typeAlias type="kdb.spring.vo.CommVo" alias="CommVo"/>
+		<typeAlias type="kdb.spring.vo.FriendVo" alias="FriendVo"/>
+		<typeAlias type="kdb.spring.vo.HashTagVo" alias="HashTagVo"/>
+		<typeAlias type="kdb.spring.vo.ItemVo" alias="ItemVo"/>
+		<typeAlias type="kdb.spring.vo.ItemVo2" alias="ItemVo2"/>
+		<typeAlias type="kdb.spring.vo.MagazineVo" alias="MagazineVo"/>
+		<typeAlias type="kdb.spring.vo.UserVo" alias="UserVo"/>
+		<typeAlias type="kdb.spring.vo.PageRequestVo" alias="PageRequestVo"/>
+		<typeAlias type="kdb.spring.vo.ScrapVo" alias="ScrapVo"/>
+	</typeAliases>
+
+	<!-- mapper등록 -->
+	<mappers>
+		<mapper resource="kdb/spring/conf/StylerMapper.xml"/>
+		<mapper resource="kdb/spring/conf/UserMapper.xml"/>
+	    <mapper resource="kdb/spring/conf/MagazineMapper.xml"/>
+		<mapper resource="kdb/spring/conf/BoardMapper.xml"/>
+		<mapper resource="kdb/spring/conf/ItemMapper.xml"/>
+		<mapper resource="kdb/spring/conf/ItemMapper2.xml"/>
+	<!--<mapper resource="kdb/spring/conf/CategoryMapper.xml"/> -->
+		<mapper resource="kdb/spring/conf/FriendMapper.xml"/>
+		<mapper resource="kdb/spring/conf/CommMapper.xml"/>
+		<mapper resource="kdb/spring/conf/HashTagMapper.xml"/>
+		<mapper resource="kdb/spring/conf/ScrapBoardMapper.xml"/>
+		
+	</mappers>
+
+
+</configuration>
+
+
+
+
+
+
+
+

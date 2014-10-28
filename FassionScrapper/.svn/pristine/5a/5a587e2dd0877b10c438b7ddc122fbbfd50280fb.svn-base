@@ -1,0 +1,219 @@
+package kdb.spring.web.controller;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import kdb.spring.service.BoardService;
+import kdb.spring.vo.BoardVo;
+import kdb.spring.vo.PageRequestVo;
+
+import org.springframework.http.HttpRequest;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+public class BoardController {
+	@Resource(name="boardService")
+	private BoardService boardService;
+	
+	@RequestMapping(value = "/loadMyScrap.do", method = RequestMethod.POST)
+	public ModelAndView loadMyScrap(HttpServletRequest request, HttpServletResponse response, HttpSession session){
+		System.out.println("loadMyScrap::ENTER");
+		String userNo = String.valueOf(request.getParameter("userNo"));
+		int curPage = Integer.parseInt(request.getParameter("curPage"));
+		List<BoardVo> boardVoList = boardService.loadMyScrap(userNo);
+		ArrayList<BoardVo> resultBoardVoList = new ArrayList<BoardVo>();
+		
+		int i=0;
+		
+		for(BoardVo vo : boardVoList){
+			if((curPage-1)*12 <= i && i < curPage*12){
+				resultBoardVoList.add(vo);
+				System.out.println(vo);
+			}
+			i++;
+		}
+		
+		ModelAndView mv = new ModelAndView("jsonView");
+		mv.addObject("resultBoardVoList",resultBoardVoList);
+		System.out.println("loadMyScrap::boardVoList.size() = "+boardVoList.size());
+		System.out.println("loadMyScrap::curPage = "+curPage);
+		System.out.println("loadMyScrap::END");
+		return mv;
+	}
+	
+	@RequestMapping(value = "/loadGetScrap.do", method = RequestMethod.POST)
+	public ModelAndView loadGetScrap(HttpServletRequest request, HttpServletResponse response, HttpSession session){
+		System.out.println("loadGetScrap::ENTER");
+		String userNo = String.valueOf(request.getParameter("userNo"));
+		int curPage = Integer.parseInt(request.getParameter("curPage"));
+		List<BoardVo> boardVoList = boardService.loadGetScrap(userNo);
+		ArrayList<BoardVo> resultBoardVoList = new ArrayList<BoardVo>();
+		
+		int i=0;
+		
+		for(BoardVo vo : boardVoList){
+			if((curPage-1)*12 <= i && i < curPage*12){
+				resultBoardVoList.add(vo);
+				System.out.println(vo);
+			}
+			i++;
+		}
+		
+		ModelAndView mv = new ModelAndView("jsonView");
+		mv.addObject("resultBoardVoList",resultBoardVoList);
+		System.out.println("loadGetScrap::boardVoList.size() = "+boardVoList.size());
+		System.out.println("loadGetScrap::curPage = "+curPage);
+		System.out.println("loadGetScrap::END");
+		return mv;
+	}
+	
+	@RequestMapping(value = "/getNumOfMyScrap.do", method = RequestMethod.POST)
+	public @ResponseBody String getNumOfMyScrap(String userNo) {                 
+		 System.out.println("getNumOfMyScrap::");
+		 return String.valueOf(boardService.getNumOfMyScrap(userNo));
+	  }
+	
+	@RequestMapping(value = "/getNumOfGetScrap.do", method = RequestMethod.POST)
+	public @ResponseBody String getNumOfGetScrap(String userNo) {                 
+		 System.out.println("getNumOfGetScrap::");
+		 return String.valueOf(boardService.getNumOfGetScrap(userNo));
+	  }
+	
+	/**
+	 * 해시태그 검색
+	 * */
+	@RequestMapping("/searchTag.do")
+	public String search(HttpServletRequest request, HttpSession session){
+		String tag = request.getParameter("tag");
+		System.out.println("tag ="+ tag);
+		List<BoardVo> list = boardService.search(tag);
+		request.setAttribute("list", list);
+		System.out.println("==========================================");
+		
+		System.out.println(list);
+		return "searchPage";
+	}
+	
+	/**
+	 * 상세보기
+	 * */
+	@RequestMapping("/read.do")
+	public ModelAndView detail(int boardNo, HttpSession session){
+		
+		BoardVo vo = boardService.detail(boardNo);
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("boardNo", vo.getBoardNo());
+		mv.addObject("title",vo.getTitle());
+		mv.addObject("userNick",vo.getUserNick());
+		mv.addObject("boardDate",vo.getBoardDate());
+		mv.addObject("recom",vo.getRecom());
+		mv.addObject("viewcnt",vo.getViewcnt());
+		mv.addObject("userNo",vo.getUserNo());
+		session.setAttribute("boardNo", vo.getBoardNo());
+		session.setAttribute("title", vo.getTitle());
+		
+		mv.setViewName("jsonView");
+		//System.out.println("==========================================");
+		//System.out.println(mv);
+		//System.out.println(boardNo);
+		return mv;
+	}
+	
+	/**
+	 * 조회수증가
+	 * */
+	@RequestMapping("/viewCnt.do")
+	public ModelAndView viewCnt(int boardNo){
+				
+		int data = boardService.viewCnt(boardNo);
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("data",data);
+		mv.setViewName("jsonView");
+		//System.out.println("==============================");
+		//System.out.println(data);
+		return mv;
+	}
+	
+	/**
+	 * 추천수증가
+	 * */
+	@RequestMapping("/recom.do")
+	public ModelAndView recomCnt(int boardNo){
+		
+		int data = boardService.recomCnt(boardNo);
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("data",data);
+		mv.setViewName("jsonView");
+		System.out.println("==============================");
+		System.out.println("추천수증가"+data);
+		return mv;
+	}	
+	
+	/**
+	 * usedItem 뿌리기
+	 * */
+	@RequestMapping("/usedItem.do")
+	public ModelAndView usedItem(int boardNo){		
+		List<String> list = boardService.usedItem(boardNo);
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("list",list);
+		mv.setViewName("jsonView");
+		System.out.println("==============================");
+		System.out.println("==============================");
+		System.out.println("==============================");
+		System.out.println("==============================");
+		System.out.println("==============================");
+		System.out.println("==============================");
+		for(String s:list){
+			System.out.println(s);
+		}		
+		return mv;
+	}
+	
+	/**
+	 * 인기 순 가져오기
+	 * */
+	@RequestMapping("/getAllBoard.do")
+	public ModelAndView getAllBoardByRecomm(int requestNum, int flag){
+		PageRequestVo prvo = new PageRequestVo();
+		prvo.setStartRowNum(requestNum);
+		prvo.setEndRowNum(requestNum+2);
+		List<BoardVo> boardVoList = new ArrayList<BoardVo>(); 
+		System.out.println("flag = "+ flag);
+		if(flag==0) 
+			boardVoList = boardService.getAllBoardByRecomm(prvo);
+		else
+			boardVoList = boardService.getAllBoardByDate(prvo);
+		
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("boardVoList",boardVoList);
+		mv.setViewName("jsonView");
+		System.out.println("==============================");
+		System.out.println("requestNum = "+requestNum);
+		for(BoardVo vo : boardVoList){
+			System.out.println(vo);
+		}
+		System.out.println("startNum = " + requestNum);
+		System.out.println("endNum = " + (requestNum+2));
+		return mv;
+	}
+	
+	@RequestMapping("/deleteMyScrap.do")
+	public ModelAndView deleteMyScrap(String boardNo){
+		int result = boardService.deleteMyScrap(boardNo);
+		System.out.println("delete result = "+result);
+		ModelAndView mv = new ModelAndView("jsonView");
+		mv.addObject("result",result);
+		return mv;
+	}
+}

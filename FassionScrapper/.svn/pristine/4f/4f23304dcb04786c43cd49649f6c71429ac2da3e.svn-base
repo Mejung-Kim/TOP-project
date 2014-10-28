@@ -1,0 +1,42 @@
+package kdb.spring.vo;
+
+public class CommVo {
+	private int comNo;
+	private String comContent;
+	private int boardNo;
+	private int memNo;
+	private String nickname;
+	
+	public int getComNo() {
+		return comNo;
+	}
+	public void setComNo(int comNo) {
+		this.comNo = comNo;
+	}
+	public String getComContent() {
+		return comContent;
+	}
+	public void setComContent(String comContent) {
+		this.comContent = comContent;
+	}
+	public int getBoardNo() {
+		return boardNo;
+	}
+	public void setBoardNo(int boardNo) {
+		this.boardNo = boardNo;
+	}
+	public int getMemNo() {
+		return memNo;
+	}
+	public void setMemNo(int memNo) {
+		this.memNo = memNo;
+	}
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+	
+
+}

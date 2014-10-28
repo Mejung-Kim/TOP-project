@@ -1,0 +1,464 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Styler</title>
+<script type="text/javascript" src="lib/jquery-1.11.1.min.js"></script>
+<!-- for image dragging -->
+<link
+	href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+	rel="stylesheet">
+<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script src="lib/html2canvas.js"></script>
+<script src="lib/jquery.plugin.html2canvas.js"></script>
+<style>
+h1 {
+	font-family: a공간M;
+	font-size: 50;
+}
+
+#container {
+	border: solid #EAEAEA;
+	margin: 0px;
+	width: 250px;
+	height: 700px;
+	float: left;
+	overflow: scroll;
+}
+
+#canvasDiv {
+	position: relative;
+	border: solid #EAEAEA;
+	margin: 0px;
+	width: 900px;
+	height: 700px;
+	float: left;
+	overflow: scroll;
+	border: solid #EAEAEA;
+}
+
+.canvasItemDiv {
+	position: absolute;
+	border: none;
+	display: inline-block;
+	border: none;
+	z-index: 0;
+}
+
+.canvasItem {
+	width: auto;
+	width: 100%;
+	height: auto;
+	height: 100%;
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.rotationIcon{
+	position:absolute;
+	border:solid 8px #FF007F;
+	border-radius:25px;
+	left:50%;
+	width:8px;
+	height:8px;
+	background-color: #FF007F;
+	opacity:0.5;
+	float:left;
+}
+
+.bring2FrontIcon{
+	position:relative;
+	border:solid 8px gray;
+	border-radius:25px;
+	left:50%;
+	width:8px;
+	height:8px;
+	background-color: gray;
+	opacity:0.5;
+	float:left;
+}
+.deleteDivIcon{
+	position:relative;
+	background-image:url('images/cancel.jpg');
+	background-size: auto auto;
+	background-size: 100% 100%;
+	display: inline-block;
+	width:25px;
+	height:25px;
+	opacity:0.6;
+	float:left;
+}
+
+*::-moz-selection
+{
+    background-color:transparent;
+}
+*
+{        
+    -webkit-user-select: none;
+}    
+input[type="text"], textarea, [contenteditable]
+{
+    -webkit-user-select: text;
+}
+
+canvas{
+	position:relative;
+	border:1px solid #222;
+	float:left;
+	clear:both;
+}
+
+</style>
+
+<script defer="defer">
+	//전역변수 초기화
+	$(function() {
+		container = document.getElementById("container");
+		canvasDiv = document.getElementById("canvasDiv");
+		transData = new Image();
+		selectedDiv = null;
+		curFunc = null;
+		initAngle = 0;
+		curAngle = 0;
+		nextAngle = 0;
+		initCenter = null;
+		max_zIndex = 0;
+		
+	});
+
+	//재료창에 아이템 불러오기
+	function loadItem(data, ev) {
+		var itemOnCloset = new Image(100, 100);
+		itemOnCloset.style.visibility = "hidden";
+		${sessionScope.userId}
+		setMultipleAttribute(itemOnCloset,"http://localhost:8000//FassionScrapper/save/" + data,
+				"item2ID_" + new Date().getTime(), true);
+
+		//이미지 사이즈 조정 후 보여주기
+		itemOnCloset.onload = function() {
+			reSizeImage(itemOnCloset, 100, 100);
+			itemOnCloset.style.visibility = "visible";
+		};
+
+		//이벤트 핸들러 연결
+		itemOnCloset.addEventListener('dragstart', function() {
+			drag(itemOnCloset);
+		});
+		itemOnCloset.addEventListener('mouseover', function() {
+			itemOnCloset.style.boxShadow = "2px 2px 2px gray";
+			itemOnCloset.style.borderRadius = "2em";
+		});
+		itemOnCloset.addEventListener('mouseleave', function() {
+			itemOnCloset.style.boxShadow = "none";
+		});
+		itemOnCloset.addEventListener('dblclick', function() {
+			addItemToCanvas(itemOnCloset, 200, 100, ev);
+		});
+
+		//캔버스에 추가
+		container.appendChild(itemOnCloset);
+	}
+
+	function allowDrop(ev) {
+		ev.preventDefault();
+	}
+	function drag(arg_item) {
+		transData = arg_item;
+		curFunc = "add";
+	}
+
+	//캔버스에 Drop시 캔버스에 아이템 추가
+	function drop(ev) {
+		ev.preventDefault();
+		if (curFunc == "add")
+			addItemToCanvas(transData, ev.pageX - canvasDiv.offsetLeft, ev.pageY
+					- canvasDiv.offsetTop, ev);
+	}
+
+	function setMultipleAttribute(item, src, id, draggable) {
+		item.setAttribute("src", src);
+		item.setAttribute("id", id);
+		item.setAttribute("draggable", draggable);
+	}
+
+	//캔버스에 아이템 추가
+	function addItemToCanvas(arg_item, arg_x, arg_y, ev) {
+		//DIV에 들어갈 이미지 셋팅
+		var cloneItem = new Image();
+		setMultipleAttribute(cloneItem, arg_item.src, "canvasItem_"
+				+ new Date().getMilliseconds(), false);
+		cloneItem.setAttribute("class", "canvasItem");
+		reSizeImage(cloneItem, 300, 300);
+
+		//회전아이콘
+		var rotationIcon = document.createElement('DIV');
+		rotationIcon.setAttribute("class","rotationIcon");
+		rotationIcon.style.visibility="hidden";
+		
+		//맨앞으로 가져오기 아이콘
+		var bring2FrontIcon = document.createElement('DIV');
+		bring2FrontIcon.setAttribute("class","bring2FrontIcon");
+		bring2FrontIcon.style.visibility="hidden";
+		
+		//삭제 아이콘
+		var deleteDivIcon = document.createElement('DIV');
+		deleteDivIcon.setAttribute("class","deleteDivIcon");
+		deleteDivIcon.style.visibility="hidden";
+		
+		//DIV 셋팅
+		var newDiv = document.createElement('DIV');
+		newDiv.setAttribute("id", "canvasItemDiv_"
+				+ new Date().getMilliseconds());
+		newDiv.setAttribute("class", "canvasItemDiv");
+		newDiv.style.left = (arg_x - 60) + "px";
+		newDiv.style.top = (arg_y - 40) + "px";
+		newDiv.setAttribute("width", cloneItem.width);
+		newDiv.setAttribute("height", cloneItem.height);
+		newDiv.setAttribute("beforeAngle", 0);
+		newDiv.style.zIndex=max_zIndex++;
+		
+		
+		newDiv.appendChild(cloneItem);
+		canvasDiv.appendChild(newDiv);
+		newDiv.appendChild(deleteDivIcon);
+		newDiv.appendChild(rotationIcon);
+		newDiv.appendChild(bring2FrontIcon);
+		
+		//이벤트 처리
+		$("#" + cloneItem.id).resizable();
+		$("#"+newDiv.id).draggable();
+		
+		rotationIcon.addEventListener('mousedown', function(e){
+			e.stopPropagation();
+			$("#"+newDiv.id).draggable('destroy');
+			changeSelectedDiv(newDiv);
+			rotationSetting(event);
+		});
+		
+		rotationIcon.addEventListener('mouseover', function(e){
+			canvasDiv.style.cursor='all-scroll';
+		});
+		
+		rotationIcon.addEventListener('mouseleave', function(e){
+			canvasDiv.style.cursor='default';
+		});
+		
+		bring2FrontIcon.addEventListener('mouseover', function(e){
+			canvasDiv.style.cursor='pointer';
+		});
+		
+		bring2FrontIcon.addEventListener('mouseleave', function(e){
+			canvasDiv.style.cursor='default';
+		});
+		
+		deleteDivIcon.addEventListener('mouseover', function(e){
+			canvasDiv.style.cursor='pointer';
+		});
+		
+		deleteDivIcon.addEventListener('mouseleave', function(e){
+			canvasDiv.style.cursor='default';
+		});
+		
+		deleteDivIcon.addEventListener('click', function(e){
+			deleteDiv();
+		});
+		
+		bring2FrontIcon.addEventListener('mousedown', function(e){
+			e.stopPropagation();
+			newDiv.style.zIndex=max_zIndex++;
+		});
+		
+		
+		newDiv.addEventListener('mousedown', function(e) {
+			changeSelectedDiv(newDiv);
+		});
+
+		newDiv.addEventListener('click', function(e) {
+			e.stopPropagation();
+			e.preventDefault();
+			changeSelectedDiv(newDiv);
+		});
+	}
+
+	function rotationSetting(e) {
+		//회전
+		initCenter = [
+				parseInt(selectedDiv.style.left)
+						+ (selectedDiv.getAttribute("width") / 2),
+				parseInt(selectedDiv.style.top)
+						+ (selectedDiv.getAttribute("height") / 2) ];
+		initAngle = getAngle(initCenter, [ e.pageX-canvasDiv.offsetLeft, e.pageY-canvasDiv.offsetTop]);
+		curFunc = "rotate";
+	}
+	
+	function deleteDiv(){
+		$('#'+selectedDiv.id).remove();
+	}
+
+	function changeSelectedDiv(arg_div) {
+		if (selectedDiv != arg_div) {
+			if (selectedDiv != null){
+				selectedDiv.childNodes[0].style.border = "none";
+				selectedDiv.childNodes[1].style.visibility="hidden";
+				selectedDiv.childNodes[2].style.visibility="hidden";
+				selectedDiv.childNodes[3].style.visibility="hidden";
+				
+			}
+			
+			selectedDiv = arg_div;
+			selectedDiv.childNodes[0].style.border = "3px dotted pink";
+			selectedDiv.childNodes[1].style.visibility="visible";
+			selectedDiv.childNodes[2].style.visibility="visible";
+			selectedDiv.childNodes[3].style.visibility="visible";
+		}
+	}
+
+	//제한된 크기에 맞춰 이미지 배율 조정
+	function reSizeImage(img, maxWidth, maxHeight) {
+		var ratio;
+		img.width = img.naturalWidth;
+		img.height = img.naturalHeight;
+
+		if (img.naturalWidth > maxWidth) {
+			ratio = maxWidth / img.naturalWidth;
+			img.width = img.naturalWidth * ratio;
+			img.height = img.naturalHeight * ratio;
+		}
+
+		if (img.height > maxHeight) {
+			ratio = maxHeight / img.height;
+			img.width = img.width * ratio;
+			img.height = img.height * ratio;
+		}
+	}
+
+	function getAngle(origin, other) {
+		dy = other[1] - origin[1];
+		dx = other[0] - origin[0];
+
+		var angle = Math.atan(dy/dx);
+		
+		if(dx<0){
+			angle += Math.PI;
+		}
+		else if(dx>0 && dy<0){
+			angle += 2*Math.PI;
+		}
+		
+		return parseFloat(angle*180/Math.PI);
+	}
+	
+
+	function make2Canvas() {
+		html2canvas([ canvasDiv ], {
+			onrendered : function(canvas) {
+				document.body.appendChild(canvas);
+			},
+			proxy : false
+		});
+		
+	}
+	//이미지 불러오는 기능
+	$(function() {
+
+		$("#fileSelect").change(function() {
+			for (var i = 0; i < fileSelect.files.length; i++) {
+				var oMyForm = new FormData();
+				oMyForm.append("file", fileSelect.files[i]);
+				$.ajax({
+					url : 'insertItemToUSerCloset.do', //데이터베이스에 아이템 저장
+					data : oMyForm,
+					dataType : 'text',
+					processData : false,
+					contentType : false,
+					type : 'POST',
+					success : function(data) {
+						loadItem(data, event); //재료창에 불러들이기
+					},
+					error : function(data) {
+						alert("이미지 불러오기에 실패했습니다." + data);
+					}
+				});
+			}
+		});
+
+		$(document).mousemove(
+				function(e) {
+					if (curFunc == "rotate") {
+						curAngle = getAngle(initCenter, [
+								e.pageX - canvasDiv.offsetLeft,
+								e.pageY - canvasDiv.offsetTop ]);
+						nextAngle = parseFloat(curAngle)
+								- parseFloat(initAngle)
+								+ parseFloat(selectedDiv
+										.getAttribute("beforeAngle"));
+
+						nextAngle = nextAngle%360;
+						if (nextAngle < 0) {
+							nextAngle = nextAngle + 360;
+						}
+
+						$("#nextAngle0").val(nextAngle);
+						$("#nextAngle1").val(curAngle);
+						$("#nextAngle2").val(initAngle);
+						$("#nextAngle3").val(
+								selectedDiv.getAttribute("beforeAngle"));
+
+						$('#' + selectedDiv.id).css('-webkit-transform',
+								'rotate(' + (nextAngle) + 'deg)');
+					}
+				});
+
+		$(document).mouseup(function(e) {
+			e.preventDefault();
+			if (curFunc == "rotate") {
+				curFunc = null;
+				$("#" + selectedDiv.id).draggable();
+				selectedDiv.setAttribute("beforeAngle", nextAngle);
+			}
+		});
+
+		$('#canvasDiv').click(function(e) {
+			e.stopPropagation();
+			
+			if(selectedDiv != null){
+				selectedDiv.childNodes[0].style.border = "none";
+				selectedDiv.childNodes[1].style.visibility = "hidden";
+				selectedDiv.childNodes[2].style.visibility = "hidden";
+				selectedDiv.childNodes[3].style.visibility = "hidden";
+				selectedDiv = null;
+			}
+		});
+
+	});
+</script>
+</head>
+
+<body>
+
+	<h1>Styler</h1>
+	beforeAngle <input type="text" id="beforeAngle" value=""> <p>
+	initAngle <input type="text" id="initAngle" value=""> <p>
+	curAngle <input type="text" id="curAngle" value=""> <p>
+	nextAngle = cur - init - before <p>
+	nextAngle <input type="text" id="nextAngle0" value="" style="width:100px"> = 
+	  <input type="text" id="nextAngle1" value="" style="width:100px"> -
+	   <input type="text" id="nextAngle2" value="" style="width:100px"> +
+	    <input type="text" id="nextAngle3" value="" style="width:100px"><p>
+	<form action="insertItemToUSerCloset.do" id="loadFileForm"
+		method="post" enctype="multipart/form-data">
+		<input type="file" name="file" id="fileSelect" multiple=""
+			accept="image/*" />
+	</form>
+	<div id="container"></div>
+	<div
+		style="background-color: white; width: 10px; height: 400px; float: left"></div>
+	<div id="canvasDiv" ondrop="drop(event)" ondragover="allowDrop(event)">
+	</div>
+	<button id="make2canvas" onclick="make2Canvas()">submit</button>
+</body>
+</html>

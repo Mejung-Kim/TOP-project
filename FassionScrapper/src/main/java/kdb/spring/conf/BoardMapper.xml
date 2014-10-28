@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+	<!-- 컬럼명과 property명을 일치-->
+	<resultMap type="BoardVo" id="boardMap">
+		<id column="board_num" property="boardNo"/>
+		<result column="mem_num" property="userNo"/>
+		<result column="board_img" property="img"/>
+		<result column="board_recom" property="recom"/>
+		<result column="board_date" property="boardDate"/>
+		<result column="board_subject" property="title"/>
+		<result column="board_type" property="type"/>
+		<result column="board_cnt" property="viewcnt"/>	
+		<result column="board_nick" property="userNick"/>	
+			
+	</resultMap> 
+
+	<!-- 내가 쓴 게시물 type:1 -->
+	<select id="boardList" parameterType="String" resultMap="boardMap">
+		select * from mem_board where mem_num=#{userNo} and board_type=1 order by board_num desc
+	</select>
+	
+	<!-- 퍼온 게시물 type:2-->
+	<select id="getItList" parameterType="String" resultMap="boardMap">
+		select * from mem_board where mem_num=#{userNo} and board_type=2 order by board_num desc
+	</select>
+	
+	<!--게시글 올리기 -->
+	<insert id="insertBoard" parameterType="BoardVo">
+		insert into mem_board values (#{boardNo}, #{userNo}, #{img}, 0, sysdate, #{title}, 1, 0, #{userNick})
+	</insert>
+	
+	<select id="loadMyScrap" parameterType="String" resultMap="boardMap">
+		select * from mem_board where mem_num = #{userNo} order by board_num desc
+	</select>
+	
+	<select id="getNumOfMyScrap" parameterType="String" resultType="Int">
+		select count(board_num) from mem_board where mem_num = #{userNo} and board_type=1
+	</select>
+	<select id="getNumOfGetScrap" parameterType="String" resultType="Int">
+		select count(board_num) from mem_board where mem_num = #{userNo} and board_type=2
+	</select>
+
+	<!-- 해시태그 검색 -->
+	<select id="search" parameterType="String" resultMap="boardMap">
+		select board.board_num, board.mem_num, board.board_img, board.board_recom,
+		 board.board_date, board.board_subject, board.board_type,
+		 board.board_cnt, board.board_nick
+		from MEM_BOARD board join HASHTAG hash
+		on board.board_num=hash.board_num and board.mem_num=hash.mem_num and hash.tag_name like '%#'||#{value}||'%'
+	</select>
+	
+	<!-- 게시물 보기 -->
+	<select id="read" parameterType="int" resultMap="boardMap">
+		select * from mem_board where board_num=#{value}
+	</select>
+	
+	<!-- 조회수증가 -->
+	<update id="viewCnt" parameterType="int">
+		update mem_board set board_cnt=board_cnt+1 where board_num=#{value}
+	</update>
+	
+	<!-- 추천수 증가-->
+	<update id="recommend" parameterType="int">
+		update mem_board set board_recom=board_recom+1 where board_num=#{value}
+	</update>
+	
+	<!-- 인기순 가져오기 -->
+	<select id="getAllBoardByRecomm" resultMap="boardMap" parameterType="PageRequestVo">
+		select A.* 
+		from (select rownum as rnum, X.* 
+			  from (select *
+			        from mem_board
+			        where board_type=1
+			        order by board_recom desc)X )A 
+		where A.rnum between #{startRowNum} and #{endRowNum}
+	</select>
+
+	<!-- 스크랩하기 -->
+	<insert id="scrap" parameterType="map">	
+		insert into mem_board(board_num, mem_num, board_img, board_recom,
+							board_date, board_subject, board_type, board_cnt, board_nick)
+		select board_seq.nextval, #{mymem_num}, board_img, board_recom,
+							board_date, board_subject, board_type+1, board_cnt, #{mymem_nick}
+		from mem_board where board_type=1 and mem_num=#{mem_num} and board_num=#{board_num}
+	</insert>
+
+	<!-- 등록일자 순 가져오기 -->
+	<select id="getAllBoardByDate" resultMap="boardMap" parameterType="PageRequestVo">
+		select A.* 
+		from (select rownum as rnum, X.* 
+			  from (select *
+			        from mem_board
+			        where board_type=1
+			        order by board_num desc)X )A 
+		where A.rnum between #{startRowNum} and #{endRowNum}
+	</select>
+
+	<!-- 게시물 삭제 -->
+	<delete id="deleteMyScrap" parameterType="String">
+		delete from mem_board where board_num=#{borad_no}
+	</delete>
+	
+	<!-- usedItem 뿌리기 -->
+	<select id="usedItem" parameterType="int">
+		select item_imag from item where board_num=#{value}
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+

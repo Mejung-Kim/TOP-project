@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="friend">
+	<!-- 컬럼명과 property명을 일치-->
+	<resultMap type="FriendVo" id="friendMap">
+		<result column="mem_num" property="memNo"/>
+		<result column="fmem_num" property="fmemNo"/>
+		<result column="fmem_name" property="fmemName"/>
+	</resultMap> 
+
+		<!-- 친구추가 -->
+	<insert id="addFriend" parameterType="FriendVo">
+		insert into friend(mem_num,fmem_num) values(#{memNo},#{fmemNo})
+	</insert> 
+	
+	<!-- 친구 목록 가져오기 -->
+	<select id="getFriendList" parameterType="String" resultMap="friendMap">
+		select A.fmem_num as fmem_num, M.mem_name as fmem_name 
+		from (select fmem_num from friend where mem_num = #{userNo}) A, member M 
+		where A.fmem_num = M.mem_num
+	</select>
+	
+	<!-- 친구목록삭제 -->
+	<delete id="delFriend" parameterType="int">
+	 delete friend where fmem_num=#{fmemNo}
+	</delete>
+</mapper>	
+
+
+
+
+
+
+
+

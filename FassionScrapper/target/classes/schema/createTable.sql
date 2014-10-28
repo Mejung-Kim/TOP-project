@@ -1,0 +1,547 @@
+select * from mem_board
+select * from member
+select * from friend
+delete from friend
+insert into friend values(108,106)
+delete from member where mem_num
+delete from hashtag where mem_num!=61
+delete from mem_board where mem_num!=115
+delete from hashtag
+commit
+select A.* 
+from (select rownum as rnum, X.* 
+	  from (select * 
+	        from mem_board 
+	        where board_type=1 
+	        order by board_recom desc)as X) as A 
+where A.rnum > 4
+
+commit
+
+select * from comm
+
+update member set mem_intro='안녕하세요 ㅎㅎ'
+where mem_num=11;
+
+/* 회원 */
+DROP TABLE member 
+	CASCADE CONSTRAINTS;
+
+/* 게시물 */
+DROP TABLE mem_board 
+	CASCADE CONSTRAINTS;
+
+/* 게시판아이템 */
+DROP TABLE item 
+	CASCADE CONSTRAINTS;
+
+/* 댓글 */
+DROP TABLE comm 
+	CASCADE CONSTRAINTS;
+
+/* 카테고리 */
+DROP TABLE category 
+	CASCADE CONSTRAINTS;
+
+/* 친구 */
+DROP TABLE friend 
+	CASCADE CONSTRAINTS;
+
+/* 해시태그 */
+DROP TABLE hashtag 
+	CASCADE CONSTRAINTS;
+
+/* 옷장아이템 */
+DROP TABLE item2 
+	CASCADE CONSTRAINTS;
+
+/* Magazine */
+DROP TABLE Magazine 
+	CASCADE CONSTRAINTS;
+
+/* 회원 */
+CREATE TABLE member (
+	mem_num INTEGER NOT NULL, /* 회원번호 */
+	mem_id VARCHAR(50) NOT NULL, /* 아이디 */
+	mem_pwd VARCHAR(25), /* 비밀번호 */
+	mem_name VARCHAR(20) NOT NULL, /* 이름 */
+	mem_sex INTEGER, /* 성별 */
+	mem_phone VARCHAR(20), /* 연락처 */
+	mem_nick VARCHAR(20), /* 별명 */
+	mem_pic VARCHAR(100), /* 프로필사진 */
+	mem_intro VARCHAR(200) /* 프로필소개 */
+);
+
+/*회원번호*/
+create sequence mem_seq;
+
+COMMENT ON TABLE member IS '회원';
+
+COMMENT ON COLUMN member.mem_num IS '회원번호';
+
+COMMENT ON COLUMN member.mem_id IS '아이디';
+
+COMMENT ON COLUMN member.mem_pwd IS '비밀번호';
+
+COMMENT ON COLUMN member.mem_name IS '이름';
+
+COMMENT ON COLUMN member.mem_sex IS '성별';
+
+COMMENT ON COLUMN member.mem_phone IS '연락처';
+
+COMMENT ON COLUMN member.mem_nick IS '별명';
+
+COMMENT ON COLUMN member.mem_pic IS '프로필사진';
+
+COMMENT ON COLUMN member.mem_intro IS '프로필소개';
+
+CREATE UNIQUE INDEX PK_member
+	ON member (
+		mem_num ASC
+	);
+
+ALTER TABLE member
+	ADD
+		CONSTRAINT PK_member
+		PRIMARY KEY (
+			mem_num
+		);
+
+/* 게시물 */
+CREATE TABLE mem_board (
+	board_num INTEGER NOT NULL, /* 게시물번호 */
+	mem_num INTEGER NOT NULL, /* 회원번호 */
+	board_img VARCHAR(100) NOT NULL, /* 스크랩이미지 */
+	board_recom INTEGER, /* 추천수 */
+	board_date DATE NOT NULL, /* 등록일자 */
+	board_subject VARCHAR(100) NOT NULL, /* 게시물제목 */
+	board_type INTEGER NOT NULL, /* 게시판구분 */
+	board_cnt INTEGER, /* 조회수 */
+	board_nick VARCHAR(20) NOT NULL /* 별명 */
+);
+/*게시판번호*/
+create sequence board_seq;
+select * from hashtag
+select * from mem_board where mem_num=2
+
+COMMENT ON TABLE mem_board IS '게시물';
+
+COMMENT ON COLUMN mem_board.board_num IS '게시물번호';
+
+COMMENT ON COLUMN mem_board.mem_num IS '회원번호';
+
+COMMENT ON COLUMN mem_board.board_img IS '스크랩이미지';
+
+COMMENT ON COLUMN mem_board.board_recom IS '추천수';
+
+COMMENT ON COLUMN mem_board.board_date IS '등록일자';
+
+COMMENT ON COLUMN mem_board.board_subject IS '게시물제목';
+
+COMMENT ON COLUMN mem_board.board_type IS '게시판구분';
+
+COMMENT ON COLUMN mem_board.board_cnt IS '조회수';
+
+COMMENT ON COLUMN mem_board.board_nick IS '별명';
+
+CREATE UNIQUE INDEX PK_mem_board
+	ON mem_board (
+		board_num ASC,
+		mem_num ASC
+	);
+
+ALTER TABLE mem_board
+	ADD
+		CONSTRAINT PK_mem_board
+		PRIMARY KEY (
+			board_num,
+			mem_num
+		);
+
+/* 게시판아이템 */
+CREATE TABLE item (
+	item_num INTEGER NOT NULL, /* 아이템번호 */
+	item_img VARCHAR(100) NOT NULL, /* 이미지 */
+	item_price VARCHAR(10), /* 가격 */
+	item_store VARCHAR(50), /* 구매처(url) */
+	item_recom INTEGER, /* 추천수 */
+	item_date DATE, /* 등록일 */
+	cate_num INTEGER, /* 카테고리번호 */
+	board_num INTEGER, /* 게시물번호 */
+	mem_num INTEGER /* 회원번호 */
+);
+
+/*게시판 아이템번호*/
+create sequence item_seq;
+
+
+COMMENT ON TABLE item IS '게시판아이템';
+
+COMMENT ON COLUMN item.item_num IS '아이템번호';
+
+COMMENT ON COLUMN item.item_img IS '이미지';
+
+COMMENT ON COLUMN item.item_price IS '가격';
+
+COMMENT ON COLUMN item.item_store IS '구매처(url)';
+
+COMMENT ON COLUMN item.item_recom IS '추천수';
+
+COMMENT ON COLUMN item.item_date IS '등록일';
+
+COMMENT ON COLUMN item.cate_num IS '카테고리번호';
+
+COMMENT ON COLUMN item.board_num IS '게시물번호';
+
+COMMENT ON COLUMN item.mem_num IS '회원번호';
+
+CREATE UNIQUE INDEX item
+	ON item (
+		item_num ASC
+	);
+
+ALTER TABLE item
+	ADD
+		CONSTRAINT item
+		PRIMARY KEY (
+			item_num
+		);
+
+/* 댓글 */
+CREATE TABLE comm (
+	com_num INTEGER NOT NULL, /* 댓글번호 */
+	com_content VARCHAR(200) NOT NULL, /* 내용 */
+	board_num INTEGER NOT NULL, /* 게시물번호 */
+	mem_num INTEGER NOT NULL /* 회원번호 */
+);
+/*댓글번호*/
+create sequence comm_seq;
+
+
+COMMENT ON TABLE comm IS '댓글';
+
+COMMENT ON COLUMN comm.com_num IS '댓글번호';
+
+COMMENT ON COLUMN comm.com_content IS '내용';
+
+COMMENT ON COLUMN comm.board_num IS '게시물번호';
+
+COMMENT ON COLUMN comm.mem_num IS '회원번호';
+
+CREATE UNIQUE INDEX comm
+	ON comm (
+		com_num ASC
+	);
+
+ALTER TABLE comm
+	ADD
+		CONSTRAINT comm
+		PRIMARY KEY (
+			com_num
+		);
+
+/* 카테고리 */
+CREATE TABLE category (
+	cate_num INTEGER NOT NULL, /* 카테고리번호 */
+	cate_name VARCHAR(20), /* 카테고리명 */
+	cate_num2 INTEGER /* 상위카테고리번호 */
+);
+
+/*카테고리 검색*/
+select * from category
+
+/*데이터 입력*/
+insert into category values(01,'outer',null); /*outer*/
+insert into category values(0101,'jacket',01); /*jacket*/
+insert into category values(0102,'coat',01); /*coat*/
+insert into category values(0103,'jumper',01); /*jumper*/
+insert into category values(0104,'cardigan',01); /*cardigan*/
+
+insert into category values(02,'top',null); /*top*/
+insert into category values(0201,'blouse',02); /*blouse*/
+insert into category values(0202,'shirts',02); /*shirts*/
+insert into category values(0203,'t-shirts',02); /*t-shirts*/
+insert into category values(0204,'knit',02); /*knit*/
+
+insert into category values(03,'bottom',null); /*bottom*/
+insert into category values(0301,'skirt',03); /*skirt*/
+insert into category values(0302,'pants',03); /*pants*/
+insert into category values(0303,'jeans',03); /*jeans*/
+insert into category values(0304,'shorts',03); /*shorts*/
+insert into category values(0305,'leggings',03); /*leggings*/
+
+insert into category values(04,'dress',null); /*dress*/
+insert into category values(0401,'one-piece',04); /*one-piece*/
+insert into category values(0402,'jumpsuit',04); /*jumpsuit*/
+
+
+insert into category values(05,'etc',null); /*etc*/
+insert into category values(0501,'shoes',05); /*신발*/
+insert into category values(0502,'acc',05); /*악세서리*/
+insert into category values(0503,'bag',05); /*가방*/
+insert into category values(0504,'hat',05); /*모자*/
+
+
+
+COMMENT ON TABLE category IS '카테고리';
+
+COMMENT ON COLUMN category.cate_num IS '카테고리번호';
+
+COMMENT ON COLUMN category.cate_name IS '카테고리명';
+
+COMMENT ON COLUMN category.cate_num2 IS '상위카테고리번호';
+
+CREATE UNIQUE INDEX PK_category
+	ON category (
+		cate_num ASC
+	);
+
+ALTER TABLE category
+	ADD
+		CONSTRAINT PK_category
+		PRIMARY KEY (
+			cate_num
+		);
+
+/* 친구 */
+CREATE TABLE friend (
+	friend_id VARCHAR(50) NOT NULL, /* 회원번호_친구 */
+	mem_num INTEGER NOT NULL /* 회원번호 */
+);
+
+COMMENT ON TABLE friend IS '친구';
+
+COMMENT ON COLUMN friend.friend_num IS '회원번호_친구';
+
+COMMENT ON COLUMN friend.mem_num IS '회원번호';
+
+CREATE UNIQUE INDEX PK_friend
+	ON friend (
+		friend_num ASC,
+		mem_num ASC
+	);
+
+ALTER TABLE friend
+	ADD
+		CONSTRAINT PK_friend
+		PRIMARY KEY (
+			friend_num,
+			mem_num
+		);
+
+/* 해시태그 */
+CREATE TABLE hashtag (
+	tag_num INTEGER NOT NULL, /* 태그번호 */
+	tag_name VARCHAR(20), /* 태그명 */
+	mem_num INTEGER NOT NULL, /* 회원번호 */
+	board_num INTEGER NOT NULL /* 게시물번호 */
+);
+
+create sequence tag_seq;
+
+COMMENT ON TABLE hashtag IS '해시태그';
+
+COMMENT ON COLUMN hashtag.tag_num IS '태그번호';
+
+COMMENT ON COLUMN hashtag.tag_name IS '태그명';
+
+COMMENT ON COLUMN hashtag.mem_num IS '회원번호';
+
+COMMENT ON COLUMN hashtag.board_num IS '게시물번호';
+
+CREATE UNIQUE INDEX PK_hashtag
+	ON hashtag (
+		tag_num ASC
+	);
+
+ALTER TABLE hashtag
+	ADD
+		CONSTRAINT PK_hashtag
+		PRIMARY KEY (
+			tag_num
+		);
+
+/* 옷장아이템 */
+CREATE TABLE item2 (
+	item_num2 INTEGER NOT NULL, /* 아이템번호 */
+	item_img2 VARCHAR(100) NOT NULL, /* 이미지 */
+	item_price VARCHAR(10), /* 가격 */
+	item_store2 VARCHAR(50), /* 구매처(url) */
+	item_date2 DATE, /* 등록일 */
+	mem_num INTEGER, /* 회원번호 */
+	cate_num INTEGER /* 카테고리번호 */
+);
+
+create sequence item2_seq;
+
+
+COMMENT ON TABLE item2 IS '옷장아이템';
+
+COMMENT ON COLUMN item2.item_num2 IS '아이템번호';
+
+COMMENT ON COLUMN item2.item_img2 IS '이미지';
+
+COMMENT ON COLUMN item2.item_price IS '가격';
+
+COMMENT ON COLUMN item2.item_store2 IS '구매처(url)';
+
+COMMENT ON COLUMN item2.item_date2 IS '등록일';
+
+COMMENT ON COLUMN item2.mem_num IS '회원번호';
+
+COMMENT ON COLUMN item2.cate_num IS '카테고리번호';
+
+CREATE UNIQUE INDEX item4
+	ON item2 (
+		item_num2 ASC
+	);
+
+ALTER TABLE item2
+	ADD
+		CONSTRAINT item4
+		PRIMARY KEY (
+			item_num2
+		);
+
+/* Magazine */
+CREATE TABLE Magazine (
+	mag_num INTEGER NOT NULL, /* 매거진번호 */
+	board_num INTEGER, /* 게시물번호 */
+	mem_num INTEGER /* 회원번호 */
+);
+
+create sequence mag_seq;
+
+
+COMMENT ON TABLE Magazine IS 'Magazine';
+
+COMMENT ON COLUMN Magazine.mag_num IS '매거진번호';
+
+COMMENT ON COLUMN Magazine.board_num IS '게시물번호';
+
+COMMENT ON COLUMN Magazine.mem_num IS '회원번호';
+
+CREATE UNIQUE INDEX PK_Magazine
+	ON Magazine (
+		mag_num ASC
+	);
+
+ALTER TABLE Magazine
+	ADD
+		CONSTRAINT PK_Magazine
+		PRIMARY KEY (
+			mag_num
+		);
+
+ALTER TABLE mem_board
+	ADD
+		CONSTRAINT FK_member_TO_mem_board
+		FOREIGN KEY (
+			mem_num
+		)
+		REFERENCES member (
+			mem_num
+		);
+
+ALTER TABLE item
+	ADD
+		CONSTRAINT FK_category_TO_item
+		FOREIGN KEY (
+			cate_num
+		)
+		REFERENCES category (
+			cate_num
+		);
+
+ALTER TABLE item
+	ADD
+		CONSTRAINT FK_mem_board_TO_item
+		FOREIGN KEY (
+			board_num,
+			mem_num
+		)
+		REFERENCES mem_board (
+			board_num,
+			mem_num
+		);
+
+ALTER TABLE comm
+	ADD
+		CONSTRAINT FK_mem_board_TO_comm
+		FOREIGN KEY (
+			board_num,
+			mem_num
+		)
+		REFERENCES mem_board (
+			board_num,
+			mem_num
+		);
+
+ALTER TABLE category
+	ADD
+		CONSTRAINT FK_category_TO_category
+		FOREIGN KEY (
+			cate_num2
+		)
+		REFERENCES category (
+			cate_num
+		);
+
+ALTER TABLE friend
+	ADD
+		CONSTRAINT FK_member_TO_friend
+		FOREIGN KEY (
+			mem_num
+		)
+		REFERENCES member (
+			mem_num
+		);
+
+ALTER TABLE hashtag
+	ADD
+		CONSTRAINT FK_mem_board_TO_hashtag
+		FOREIGN KEY (
+			board_num,
+			mem_num
+		)
+		REFERENCES mem_board (
+			board_num,
+			mem_num
+		);
+
+		select * from item2;
+ALTER TABLE item2
+	ADD
+		CONSTRAINT FK_member_TO_item2
+		FOREIGN KEY (
+			mem_num
+		)
+		REFERENCES member (
+			mem_num
+		);
+
+ALTER TABLE item2
+	ADD
+		CONSTRAINT FK_category_TO_item22
+		FOREIGN KEY (
+			cate_num
+		)
+		REFERENCES category (
+			cate_num
+		);
+
+ALTER TABLE Magazine
+	ADD
+		CONSTRAINT FK_mem_board_TO_Magazine
+		FOREIGN KEY (
+			board_num,
+			mem_num
+		)
+		REFERENCES mem_board (
+			board_num,
+			mem_num
+		);
+select * from item2 where mem_num=2
+select * from member		
+insert into item2 values(seq_item2.nextval,'blueT','30000원','동대문',sysdate,2,0203)
+commit

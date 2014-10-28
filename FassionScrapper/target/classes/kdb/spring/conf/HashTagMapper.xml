@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hashtag">
+	<!-- 컬럼명과 property명을 일치-->
+	<resultMap type="HashTagVo" id="hashtagMap">
+		<id column="tag_num" property="tagNo"/>
+		<result column="tag_name" property="tagName"/>
+		<result column="mem_num" property="memNo"/>
+		<result column="board_num" property="boardNo"/>
+	</resultMap> 
+	
+	<insert id="insertHashTag" parameterType="HashTagVo">
+		insert into hashtag values (tag_seq.nextval,#{tagName},#{memNo},#{boardNo})
+	</insert>
+	
+	<!-- 태그가져오기 -->
+	<select id="tagname" parameterType="int" resultMap="hashtagMap">
+		select tag_name from hashtag where board_num=#{value}
+	</select>
+</mapper>
+
+
+
+
+
+
+

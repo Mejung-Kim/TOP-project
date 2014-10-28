@@ -1,0 +1,282 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"	
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<title>Join Page</title>
+<meta name="generator" content="Bootply" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">	
+	<link href="lib/3-col-portfolio/css/bootstrap.css" rel="stylesheet">
+	<link href="lib/3-col-portfolio/css/3-col-portfolio.css" rel="stylesheet">
+	<!--[if lt IE 9]>
+	<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	
+	<style type="text/css">
+	footer{
+		font-size:18px;
+	}
+	.btn-danger, .btn-default{
+			font-family:HY강M;	
+			font-size:18px;
+			height:34px;
+	}
+	.form-horizontal .control-label{
+		font-family:HY강M;
+		font-size:18px;
+	}
+	.form-control{
+		font-family:HY강M;
+	}
+	.radio label, .checkbox label{
+		font-family:HY강M;
+		font-size:16px;
+
+	}
+	
+	</style>
+<script type="text/javascript" src="lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript">
+	$(function(){
+		//email check
+		$("#userId").keyup(function(){
+			$.ajax({
+				url:"idCheck.do",
+				type:"post",
+				dataType:"text",
+				data:"userId=" + $(this).val(),
+				success:function(data){
+					$("#emailCheck").html(data);
+				},
+				error:function(err){
+					alert(err+"오류발생!!!");
+				}
+			})//ajax끝
+		})//keyup끝
+		
+		
+		//별명중복체크
+		$("#nickname").keyup(function(){
+			$.ajax({
+				url:"nickCheck.do",
+				type:"post",
+				dataType:"text",
+				data:"nickname="+ $(this).val(),
+				success:function(result){
+					$("#nickCheck").html(result);
+				},
+				error:function(err){
+					alert(err+"오류발생");
+				}
+			})
+		}); //keyup끝
+				
+		//insert
+		$("#joinBtn").click(function(){
+			if(($("#emailCheck").text()=="You can not use this!") || ($("#nickCheck").text()=="You can not use this!"
+					|| ($("#passCheck").text()=="Passwords do not match"))){
+				alert("Join Failed");
+				history.back();
+				
+			}else{
+				$.ajax({
+					url:"insert.do",
+					type:"post",
+					dataType:"json", //결과데이터 타입
+					data:$("#joinForm").serialize(),
+					success:function(result){
+						if(result.data>0){
+							alert("가입성공~");
+							location.href="index.html";
+							
+							
+						}else{
+							alert("Join Failed");
+						}
+					},
+					error:function(data){
+						alert(data+'=>error 에러발생');
+					}
+				});//ajax끝
+				
+			}
+			
+		})//click끝
+		
+
+		
+		//passward확인
+		$("#pass2").keyup(function(){
+			if($("#pass").val() == $("#pass2").val()){
+				$("#passCheck").text("Passwords matches");
+			}else
+				$("#passCheck").text("Passwords do not match");
+		});//keyup끝
+		
+		
+	})
+
+</script>
+
+</head>
+
+
+<body>
+	<!-- Wrap all page content here -->
+	
+		   <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">Home</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+					<li><a href="requestLogin.do">MyPage</a></li>					
+				</ul>
+
+				<div class="col-sm-1 col-md-3 navbar-left">
+					<form class="navbar-form" role="search">
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Search"
+								name="srch-term" id="srch-term">
+					<div class="input-group-btn">
+						<a href="requestLogin.do">
+						<button class="btn btn-nav"	type="submit">
+							<i class="glyphicon glyphicon-search"></i>
+						</button>
+						</a>
+					</div>
+					</div>
+					</form>
+				</div>
+				
+				 <form class="navbar-form navbar-right">
+				<a href="requestLogin.do"><button class="btn btn-nav" type="button">Login</button></a>
+				<a href="joinForm.do"><button class="btn btn-nav" type="button">Sign up</button></a>
+				</form>
+			</div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+		<!-- Begin page content -->
+		<div class="container">
+		
+		
+		
+		<form class="form-horizontal" id="joinForm">
+		  <fieldset>
+		    <legend>Join Form</legend>
+		    <div class="form-group">
+		      <label class="col-lg-2 control-label" for="inputEmail">Email</label>
+		      <div class="col-lg-3 col-md-2">
+		        <input class="form-control" id="userId" type="text" placeholder="ex) asdf1234@naver.com" name="userId">
+		      </div>
+		      <div class="col-lg-3 col-md-2"> 
+		      	<label class="col-lg-12 control-label" for="emailCheck">
+		      		<span id="emailCheck" style="border:2px dashed #F4C403; position:absolute; left:0px">&nbsp;EmailCheck&nbsp;</span>
+		      	</label>
+		      </div>
+		    </div>
+		    
+		    <div class="form-group">
+		      <label class="col-lg-2 control-label" for="inputPassword">Password</label>
+		      <div class="col-lg-2 col-md-2">
+		        <input class="form-control" id="pass" type="password" placeholder="Password" name="pass">
+		      </div>
+		       <label class="col-lg-2 control-label" for="inputPassword2">Password check</label>
+		      <div class="col-lg-2 col-md-2">
+		        <input class="form-control" id="pass2" type="password" placeholder="Password">
+		      </div>
+		      <div class="col-lg-3 col-md-2">
+		      	<label class="col-lg-12 control-label" for="nickCheck">
+		      		<span id="passCheck" style="border:2px dashed #F4C403; position:absolute; left:0px">&nbsp;PassCheck&nbsp;</span>
+		      	</label>
+		      </div>
+		    </div>
+		    
+		     
+		    
+		    <div class="form-group">
+		      <label class="col-lg-2 control-label" for="inputName">Name</label>
+		      <div class="col-lg-3 col-md-2">
+		        <input class="form-control" id="userName" type="text" placeholder="ex) 김철수" name="userName">
+		      </div>
+		    </div>
+		    
+		      <div class="form-group">
+		      <label class="col-lg-2 control-label" for="inputNick">Nickname</label>
+		      <div class="col-lg-3 col-md-2">
+		        <input class="form-control" id="nickname" type="text" placeholder="ex) 영희내꺼" name="nickname">
+		      </div>
+		      <div class="col-lg-3 col-md-2"> 
+		      	<label class="col-lg-12 control-label" for="nickCheck">
+		      		<span id="nickCheck" style="border:2px dashed #F4C403; position:absolute; left:0px">&nbsp;NickCheck&nbsp;</span>
+		      	</label>
+		      </div>
+		    </div>
+		    
+		    
+		    <div class="form-group">
+		      <label class="col-lg-2 control-label">Gender</label>
+		      <div class="col-lg-3 col-md-2">
+		        <div class="radio">
+		          <label>
+		            <input name="gender" id="gender" type="radio" checked="checked" value="1" >Man
+		          </label>
+		        </div>
+		        <div class="radio">
+		          <label>
+		            <input name="gender" id="gender2" type="radio" value="0">Woman
+		          </label>
+		        </div>
+		      </div>
+		    </div>
+		    
+		    <div class="form-group">
+		      <div class="col-lg-5 col-lg-offset-2">
+		        <button class="btn btn-danger" type="button" id="joinBtn">Submit</button>
+		        <button class="btn btn-default" type="button">Cancel</button>
+		      </div>
+		    </div>
+		    
+		  </fieldset>
+		</form>
+		
+		
+		 <hr>
+
+        
+        <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; TOP project 2014</p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </footer>
+					
+	</div>
+
+
+	
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="lib/3-col-portfolio/js/bootstrap.min.js"></script>
+</body>
+</html>

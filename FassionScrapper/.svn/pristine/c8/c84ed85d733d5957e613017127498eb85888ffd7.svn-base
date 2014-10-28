@@ -1,0 +1,48 @@
+package kdb.spring.dao;
+
+import kdb.spring.vo.UserVo;
+
+public interface UserDao {
+	
+	public int createUser(UserVo vo);
+	
+	/**
+	 * facebook 계정 로그인 insert
+	 * */
+	public int insertFB(UserVo vo);
+	
+	/**
+	 *아이디 중복체크
+	 * */
+	UserVo idCheck(String userId);
+	
+	/**
+	 *별명 중복체크
+	 * */
+	UserVo nickCheck(String nickname);
+
+	/**
+	 * 로그인처리 
+	 * */
+	public UserVo loginCheck(UserVo vo);
+	
+	/**
+	 * 회원정보 수정
+	 * */
+	public int updateInfo(UserVo vo);
+	
+	/**
+	 * 회원탈퇴
+	 * */
+	public int deleteUser(String userId);
+	
+	/**
+	 * 프로필사진 수정
+	 */
+	int updateProfile(UserVo vo);
+	
+	/**
+	 * 자기소개 수정
+	 */
+	int updateIntro(UserVo vo);
+}
