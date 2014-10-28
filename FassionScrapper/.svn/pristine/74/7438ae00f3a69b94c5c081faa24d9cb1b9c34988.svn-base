@@ -1,0 +1,19 @@
+package kdb.spring.service;
+
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import kdb.spring.dao.FriendDao;
+import kdb.spring.vo.FriendVo;
+
+public class FriendServiceImpl implements FriendService {
+	@Resource(name="friendDao") //FriendDaoImpl객체생성
+	private FriendDao friendDao;
+
+	@Override
+	public int addFriend(FriendVo vo) {
+		return friendDao.addFriend(vo);
+	}
+
+}

@@ -1,0 +1,420 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+
+<%
+int boardNo = Integer.parseInt(request.getParameter("boardNo"));
+%>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>Fashion Scrapper</title>
+		<meta name="generator" content="Bootply" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="lib/3-col-portfolio/css/bootstrap.css" rel="stylesheet">
+		<link href="lib/3-col-portfolio/css/3-col-portfolio.css" rel="stylesheet">
+		<!--[if lt IE 9]>
+			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+	<style type="text/css">
+	footer{
+		font-size:18px;
+	}
+	a{
+		color:#BCBCBC;
+		font-size:20px;
+	}
+	.btn-danger, .btn-default{
+			font-family:HY강M;	
+			font-size:18px;
+			height:34px;
+	}
+	
+	.nav-pills>li{
+		float:none ; font-size:20px
+	}
+	#date{
+		font-family:HY강M;
+		font-size:20px;
+		float:right;
+		width:610px;
+		padding-left:5px;
+	}
+	.media-body{
+		font-family:HY강M;
+		font-size:15px;
+	}
+	.img-responsive{
+		width:100%;
+		margin-right:50px;
+		border:2px dashed #D9534F;
+		margin-top:15px;
+		margin-bottom:15px;
+	}
+	#scrapName{
+		padding:0;
+		height:39px;
+		border:1px solid #D9534F; 
+		font-size:25px;
+		font-family:HY강M;
+	}
+	#hashtag{
+		padding:0;
+		height:39px;
+		border:1px dashed #D9534F;
+		font-size:20px;
+		font-family:HY강M;
+		color:#838383;
+		padding-top:5px;
+		padding-left:10px;
+	}
+	#usedItem{
+		background-color:#D9534F;
+		width:455px; 
+		height:39px;
+		color:white; 
+		font-size:25px;
+		font-family:;
+		
+	}
+	#commentHeader{
+		background-color:#D9534F;
+		width:100%; 
+		height:30px;
+		color:white; 
+		font-size:20px;
+		font-family:HY강M;
+	}
+	#writer{
+		font-family:HY강M;
+	}
+	#recom{
+		font-size:20px;
+		color:#D9534F;
+		border:2px dashed #FC7C7A;
+		cursor:pointer;
+		float:right;
+		margin-bottom:15px;
+	
+	}
+	</style>
+    <!-- jQuery Version 1.11.0 -->
+	<script type="text/javascript" src="lib/jquery-1.11.1.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="lib/3-col-portfolio/js/bootstrap.min.js"></script>
+	
+	<!-- logout -->
+    <script type="text/javascript">
+	$(function(){
+		//logout	
+		$("#logoutbt").click(function(){
+			alert("로그아웃되었습니다.")
+			location.href="logout.do";
+		}); //click끝	
+		
+		$("#backBtn").click(function(){
+			history.back();
+		});
+	})
+	</script>
+	
+	<script type="text/javascript">	
+	 sessionRealPath = "http://localhost:8000//FassionScrapper/";
+	 $(function(){
+			getData();
+
+			$.ajax({
+				url:'read.do',
+				type:"POST",
+				dataType:"json",
+				data:"boardNo="+<%=boardNo %>,
+				success:function(result){					
+					$("#boardimg").attr("src", sessionRealPath+'boardImage/'+result.boardNo+'.png');
+								
+					var div="";
+					div+=result.boardDate;
+					div+="&emsp;";
+					div+="조회수:"+result.viewcnt;
+					div+="&emsp;";
+					div+="추천수:"+result.recom;
+					div+="&emsp;&emsp;&emsp;&emsp;&emsp;";
+					div+="&emsp;&emsp;&emsp;&emsp;";					
+					div+="<img src='img/top.jpg' id='recom'>";
+
+					$("#date").html(div);
+					
+					var str="";
+					str+=result.title;
+					$("#scrapName").html(str);
+					
+				 	var str="";
+					str+="<a href='goUserPage.do?userNo="+result.userNo+"&sessionUserNo=${sessionScope.userNo}'>";
+					str+="by &nbsp;"+result.userNick;
+					str+="</a>";
+					$("#writer").html(str); 
+					
+				},
+				error:function(err){//실패했을때
+					alert(err+"=>에러발생");
+				}
+			});//ajax끝
+			
+			$.ajax({
+				url:'viewCnt.do',
+				type:"POST",
+				dataType:"text",
+				data:"boardNo="+<%=boardNo %>,
+				success:function(result){
+				},
+				error:function(err){//실패했을때
+					alert(err+"=>에러발생");
+				}
+		
+			});//ajax끝
+			
+			$(document).on("click", "#recom", function(){
+				$.ajax({
+					url:'recom.do',
+					type:"POST",
+					dataType:"text",
+					data:"boardNo="+<%=boardNo %>,
+					success:function(result){
+						window.location.reload();
+					},
+					error:function(err){//실패했을때
+						alert(err+"=>에러발생");
+					}
+				});//ajax끝			
+			})//click끝
+			
+			 $("#commbtn").click(function(){
+				$.ajax({
+					url:"commW.do",
+					type:"post",
+					dataType:"text", //결과데이터 타입
+					data:"comContent="+$("#comContent").val()+"&boardNo="+<%=boardNo%>, //폼에 있는 모든 데이터 전송
+					success: function(result){
+							alert("등록");
+							//text박스 모두 지우기
+							$("input[type=text]").val("");
+							//모든레코드 검색하는 함수 호출
+							getData();
+					},
+					error: function(data){
+						alert('댓글 입력 에러발생')
+					}
+				});//ajax끝
+			});//click끝 
+			function getData(){
+				$.ajax({
+					url:"commR.do",
+					type:"post",
+					dataType:"json",
+					data:"boardNo="+<%=boardNo %>,
+					success: function(data){	
+						var div="";
+						$(".commList").empty();
+						$(data.list).each(function(index, item){
+			                div+="<div class='media'>";
+			                //div+="<a class='pull-left' href='#'>"
+			                //div+="<img class='media-object' src='http://placehold.it/64x64' alt=''>";
+	                    	//div+="</a>"
+							div+="<div class='media-body'>";
+							div+="&emsp;"+"<a href='#'>"+item.nickname+"</a>";
+							div+="&emsp;"+item.comContent;
+							//div+="<input type='button' value='삭제' id='del'name='"+item.comNo+"'>";
+							//div+="</h5>";
+							div+="</div>";
+							div+="</div>";
+						})//반복문 끝
+						//테이블에 추가
+						$(".commList:eq(0)").append(div);
+					},
+					error: function(err){//실패했을때
+						alert("댓글 에러발생")
+					}
+				})//ajax끝
+			}//getData끝
+			
+			$.ajax({
+				url:"tag.do",
+				type:"post",
+				dataType:"json",
+				data:"boardNo="+<%=boardNo %>,
+				success:function(result){
+					if(result!=null)
+						$("#hashtag").html(result.name);
+					else
+						alert('태그없음');
+				},
+				error:function(err){
+					alert("태그 오류발생");
+				}
+			})//ajax끝
+				
+			
+				$("#getBtn").click(function(){
+					alert("버튼클릭");
+					$.ajax({
+						url : 'scrapboard.do', //데이터베이스에 아이템 저장
+						type : 'POST',
+						dataTye : 'text',
+						data:"boardNo="+<%=boardNo%>,
+						success : function(data) {
+							alert(data);
+						},
+						error : function(data) {
+							alert("실패했습니다.");
+						},
+					});//ajax끝
+					
+				})//click 끝	
+	
+			
+			
+	 });
+	</script>
+	
+	</head>
+	<body>
+	<!-- Wrap all page content here -->
+		  <!-- Fixed navbar -->
+		   <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="clientMain.do">Home</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+					<li><a href="myPage.do">MyPage</a></li>
+					<li class="dropdown"><a href="requestLogin.do"
+						class="dropdown-toggle" data-toggle="dropdown">Look Over <b
+							class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li><a href="requestLogin.do">Total Styling</a></li>
+							<li><a href="requestLogin.do">Favorite Styling</a></li>
+							<li class="divider"></li>
+							<li class="dropdown-header">category</li>
+							<li><a href="requestLogin.do">Another Things</a></li>
+						</ul>
+					</li>
+				</ul>
+
+				<div class="col-sm-1 col-md-3 navbar-left">
+					<form class="navbar-form" role="search">
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Search"
+								name="srch-term" id="srch-term">
+					<div class="input-group-btn">
+						<a href="requestLogin.do">
+						<button class="btn btn-danger"	type="submit">
+							<i class="glyphicon glyphicon-search"></i>
+						</button>
+						</a>
+					</div>
+					</div>
+					</form>
+				</div>
+				
+				 <form class="navbar-form navbar-right">				 
+				<button class="btn btn-danger" type="button">${sessionScope.nickname}님 환영합니다</button>
+				<button class="btn btn-danger" type="button" id="logoutbt">Logout</button>
+				</form>
+			</div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+  
+     <!-- Page Content -->
+    <div class="container">
+
+        <!-- Page Header -->
+       		<div class="row">
+       			<div class="col-lg-12">
+       				<h3 class="page-header text-right">
+						<button type="button" class="btn btn-danger" id="backBtn" onclick="location.href='historyback()'">Back</button>
+					</h3>		       				
+       			</div>
+       		</div>
+       		
+	       	<div class="row">
+				<div class="col-lg-7 portfolio-item">
+					<div class="col-lg-12 text-center" id="scrapName" >
+					Scrap Name
+					</div>
+					<div class="lead" align="right" id="writer">
+                
+                	</div>
+				<!-- Author -->
+
+                <!-- Date/Time -->
+                <div class="glyphicon glyphicon-time" style="float:left; font-size:20px;"></div>
+                <div id="date" align="left"></div>                
+					<img class="img-responsive"  id="boardimg" src="" alt="">
+					<div class="col-lg-10" id="hashtag"></div>
+					<div class="col-lg-2 text-right"  style="padding:0;">
+					<input type="button" class="btn btn-danger" style=" width:100%; height:39px; font-size:23px;" value="Get it" id="getBtn">
+					</div>
+				
+						
+				</div>
+				<div class="col-lg-5">
+					<div style="border:1px solid #D9534F; width:457px; height:451px;">
+						<div class="text-center" id="usedItem"> Used Items </div>
+					</div>
+				</div>
+			</div>
+			<!-- /.row -->
+			
+			<div class="row">
+				<div class="col-lg-7">
+					<div style="border:1px solid #D9534F; width:100%; height:100px;">
+						<div class="text-center" id="commentHeader">Comments</div>
+						<div class="col-lg-10" style="padding-top:15px; padding-right:0;">
+						<input type="text" id="comContent" style="width:100%; border:1px dashed #D9534F; height:30px; font-size:15px;" >
+						</div>
+						<div class="col-lg-2" style="padding-top:15px;">
+						<button type="button" class="btn btn-danger" style=" width:100%; height:30px;" id="commbtn">Submit</button>
+						</div>
+						<hr>	
+					</div>
+				</div>				
+			</div>
+			<p>
+			<div class="row">
+				<div class="commList">
+				</div>
+			</div>
+			
+			<!-- /.row -->
+			
+			
+     <hr>
+		<!-- Footer -->
+		<footer>
+			<div class="row">
+				<div class="col-lg-12">
+					<p>Copyright &copy; TOP project 2014</p>
+				</div>
+			</div>
+			<!-- /.row -->
+		</footer>
+
+	</div>
+
+
+	
+	</body>
+</html>

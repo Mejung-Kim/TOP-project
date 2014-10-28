@@ -1,0 +1,16 @@
+package kdb.spring.service;
+
+
+import java.util.List;
+import java.util.Map;
+
+import kdb.spring.vo.BoardVo;
+import kdb.spring.vo.ScrapVo;
+
+public interface ScrapService {
+	
+	//스크랩2
+	public int scrapB(ScrapVo vo);
+	
+	public int getLastBNo();
+}

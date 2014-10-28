@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="user">
+	<!-- 컬럼명과 property명을 일치-->
+	<resultMap type="UserVo" id="userMap">
+		<id column="mem_num" property="userNo"/>
+		<result column="mem_id" property="userId"/>
+		<result column="mem_pwd" property="pass"/>
+		<result column="mem_name" property="userName"/>
+		<result column="mem_sex" property="gender"/>
+		<result column="mem_phone" property="phone"/>
+		<result column="mem_nick" property="nickname"/>
+		<result column="mem_pic" property="profileImg"/>
+		<result column="mem_intro" property="intro"/>	
+	</resultMap> 
+	
+	<insert id="createUser" parameterType="UserVo">
+		insert into member(mem_num, mem_id, mem_pwd, mem_name, mem_nick, mem_sex) 
+		values (mem_seq.nextval,#{userId},#{pass},#{userName},#{nickname},#{gender})
+	</insert>
+	
+	<!-- 페이스북회원 등록 -->
+	<insert id="insertFb" parameterType="UserVo" >
+		insert into member(mem_num, mem_id, mem_name) values (mem_seq.nextval,#{userId},#{userName})
+	</insert>
+	
+	<!-- 아이디 중복여부체크 -->
+	<select id="idCheck" parameterType="String" resultMap="userMap">
+		select * from member where mem_id=#{value}
+	</select>
+	
+	<!-- 별명 중복여부체크 -->
+	<select id="nickCheck" parameterType="String" resultMap="userMap">
+		select * from member where mem_nick=#{value}
+	</select>
+	
+		<!-- 로그인 -->
+	<select id="login" parameterType="UserVo" resultMap="userMap">
+		select * from member where mem_id=#{userId} and mem_pwd=#{pass}
+	</select>
+	
+	<!-- 회원정보수정 -->
+  	<update id="update" parameterType="UserVo">
+		update member set mem_pwd=#{pass}, mem_nick=#{nickname}, mem_phone=#{phone}
+		where mem_id=#{userId}
+	</update>  
+	
+	<!-- 회원탈퇴 -->
+	<delete id="delete" parameterType="String">
+		delete from member where mem_id=#{userId}
+	</delete>
+	
+	<!-- 프로필사진 수정 -->
+	<update id="updateProfile" parameterType="UserVo">
+		update member set mem_pic=#{profileImg}
+		where mem_num=#{userNo}
+	</update>
+	
+	<!-- 자기소개 수정 -->
+	<update id="updateIntro" parameterType="UserVo">
+		update member set mem_intro=#{intro}
+		where mem_num=#{userNo}
+	</update>
+	
+	<!-- 자기소개 가져오기 -->
+	<select id="getIntro" parameterType="String" resultType="String">
+		select mem_intro from member where mem_num=#{userNo}
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+

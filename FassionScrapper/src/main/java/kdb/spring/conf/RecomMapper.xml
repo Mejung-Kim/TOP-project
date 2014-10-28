@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="reco">
+	<!-- 컬럼명과 property명을 일치-->
+
+	<insert id="recomIn" parameterType="RecomVo">
+		insert into recommend values (#{mem_num}, #{board_num}, 1)
+	</insert>
+	
+	<select id="recomS" parameterType="RecomVo" resultType="int">
+		select count(recom) from recommend where mem_num=#{mem_num} and board_num=#{board_num}
+	</select>
+	
+</mapper>
+
