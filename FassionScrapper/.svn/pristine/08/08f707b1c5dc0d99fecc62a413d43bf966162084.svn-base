@@ -1,0 +1,13 @@
+package kdb.spring.service;
+import java.util.Map;
+
+import kdb.spring.vo.FriendVo;
+
+public interface FriendService {
+	/**
+	 * 친구추가
+	 * */
+	public int addFriend(FriendVo vo);
+
+
+}
